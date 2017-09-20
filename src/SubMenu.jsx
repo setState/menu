@@ -363,6 +363,7 @@ const SubMenu = createReactClass({
       prefixCls: props.rootPrefixCls,
       id: this._menuId,
       ref: this.saveMenuInstance,
+      count: props.count,
     };
     return <SubPopupMenu {...baseProps}>{children}</SubPopupMenu>;
   },
