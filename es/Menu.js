@@ -1,62 +1,45 @@
-'use strict';
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
+// import React from 'react';
+import PropTypes from 'prop-types';
+import createReactClass from 'create-react-class';
+import MenuMixin from './MenuMixin';
+import { noop } from './util';
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; // import React from 'react';
-
-
-var _propTypes = require('prop-types');
-
-var _propTypes2 = _interopRequireDefault(_propTypes);
-
-var _createReactClass = require('create-react-class');
-
-var _createReactClass2 = _interopRequireDefault(_createReactClass);
-
-var _MenuMixin = require('./MenuMixin');
-
-var _MenuMixin2 = _interopRequireDefault(_MenuMixin);
-
-var _util = require('./util');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-var Menu = (0, _createReactClass2['default'])({
+var Menu = createReactClass({
   displayName: 'Menu',
 
   propTypes: {
-    openSubMenuOnMouseEnter: _propTypes2['default'].bool,
-    closeSubMenuOnMouseLeave: _propTypes2['default'].bool,
-    selectedKeys: _propTypes2['default'].arrayOf(_propTypes2['default'].string),
-    defaultSelectedKeys: _propTypes2['default'].arrayOf(_propTypes2['default'].string),
-    defaultOpenKeys: _propTypes2['default'].arrayOf(_propTypes2['default'].string),
-    openKeys: _propTypes2['default'].arrayOf(_propTypes2['default'].string),
-    mode: _propTypes2['default'].string,
-    onClick: _propTypes2['default'].func,
-    onSelect: _propTypes2['default'].func,
-    onDeselect: _propTypes2['default'].func,
-    onDestroy: _propTypes2['default'].func,
-    openTransitionName: _propTypes2['default'].string,
-    openAnimation: _propTypes2['default'].oneOfType([_propTypes2['default'].string, _propTypes2['default'].object]),
-    level: _propTypes2['default'].number,
-    eventKey: _propTypes2['default'].string,
-    selectable: _propTypes2['default'].bool,
-    children: _propTypes2['default'].any
+    openSubMenuOnMouseEnter: PropTypes.bool,
+    closeSubMenuOnMouseLeave: PropTypes.bool,
+    selectedKeys: PropTypes.arrayOf(PropTypes.string),
+    defaultSelectedKeys: PropTypes.arrayOf(PropTypes.string),
+    defaultOpenKeys: PropTypes.arrayOf(PropTypes.string),
+    openKeys: PropTypes.arrayOf(PropTypes.string),
+    mode: PropTypes.string,
+    onClick: PropTypes.func,
+    onSelect: PropTypes.func,
+    onDeselect: PropTypes.func,
+    onDestroy: PropTypes.func,
+    openTransitionName: PropTypes.string,
+    openAnimation: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+    level: PropTypes.number,
+    eventKey: PropTypes.string,
+    selectable: PropTypes.bool,
+    children: PropTypes.any
   },
 
-  mixins: [_MenuMixin2['default']],
+  mixins: [MenuMixin],
 
   getDefaultProps: function getDefaultProps() {
     return {
       openSubMenuOnMouseEnter: true,
       closeSubMenuOnMouseLeave: true,
       selectable: true,
-      onClick: _util.noop,
-      onSelect: _util.noop,
-      onOpenChange: _util.noop,
-      onDeselect: _util.noop,
+      onClick: noop,
+      onSelect: noop,
+      onOpenChange: noop,
+      onDeselect: noop,
       defaultSelectedKeys: [],
       defaultOpenKeys: []
     };
@@ -246,5 +229,4 @@ var Menu = (0, _createReactClass2['default'])({
   }
 });
 
-exports['default'] = Menu;
-module.exports = exports['default'];
+export default Menu;

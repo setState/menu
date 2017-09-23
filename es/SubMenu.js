@@ -1,82 +1,56 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _propTypes = require('prop-types');
-
-var _propTypes2 = _interopRequireDefault(_propTypes);
-
-var _createReactClass = require('create-react-class');
-
-var _createReactClass2 = _interopRequireDefault(_createReactClass);
-
-var _SubPopupMenu = require('./SubPopupMenu');
-
-var _SubPopupMenu2 = _interopRequireDefault(_SubPopupMenu);
-
-var _KeyCode = require('rc-util/lib/KeyCode');
-
-var _KeyCode2 = _interopRequireDefault(_KeyCode);
-
-var _classnames = require('classnames');
-
-var _classnames2 = _interopRequireDefault(_classnames);
-
-var _util = require('./util');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+import React from 'react';
+import PropTypes from 'prop-types';
+import createReactClass from 'create-react-class';
+import SubPopupMenu from './SubPopupMenu';
+import KeyCode from 'rc-util/es/KeyCode';
+import classnames from 'classnames';
+import { noop, loopMenuItemRecusively } from './util';
+
 var guid = 0;
 
-/* eslint react/no-is-mounted:0 */
 
-var SubMenu = (0, _createReactClass2['default'])({
+
+var SubMenu = createReactClass({
   displayName: 'SubMenu',
 
   propTypes: {
-    parentMenu: _propTypes2['default'].object,
-    title: _propTypes2['default'].node,
-    children: _propTypes2['default'].any,
-    selectedKeys: _propTypes2['default'].array,
-    openKeys: _propTypes2['default'].array,
-    onClick: _propTypes2['default'].func,
-    onOpenChange: _propTypes2['default'].func,
-    rootPrefixCls: _propTypes2['default'].string,
-    eventKey: _propTypes2['default'].string,
-    multiple: _propTypes2['default'].bool,
-    active: _propTypes2['default'].bool,
-    onSelect: _propTypes2['default'].func,
-    closeSubMenuOnMouseLeave: _propTypes2['default'].bool,
-    openSubMenuOnMouseEnter: _propTypes2['default'].bool,
-    onDeselect: _propTypes2['default'].func,
-    onDestroy: _propTypes2['default'].func,
-    onItemHover: _propTypes2['default'].func,
-    onMouseEnter: _propTypes2['default'].func,
-    onMouseLeave: _propTypes2['default'].func,
-    onTitleMouseEnter: _propTypes2['default'].func,
-    onTitleMouseLeave: _propTypes2['default'].func,
-    onTitleClick: _propTypes2['default'].func
+    parentMenu: PropTypes.object,
+    title: PropTypes.node,
+    children: PropTypes.any,
+    selectedKeys: PropTypes.array,
+    openKeys: PropTypes.array,
+    onClick: PropTypes.func,
+    onOpenChange: PropTypes.func,
+    rootPrefixCls: PropTypes.string,
+    eventKey: PropTypes.string,
+    multiple: PropTypes.bool,
+    active: PropTypes.bool,
+    onSelect: PropTypes.func,
+    closeSubMenuOnMouseLeave: PropTypes.bool,
+    openSubMenuOnMouseEnter: PropTypes.bool,
+    onDeselect: PropTypes.func,
+    onDestroy: PropTypes.func,
+    onItemHover: PropTypes.func,
+    onMouseEnter: PropTypes.func,
+    onMouseLeave: PropTypes.func,
+    onTitleMouseEnter: PropTypes.func,
+    onTitleMouseLeave: PropTypes.func,
+    onTitleClick: PropTypes.func
   },
 
   mixins: [require('./SubMenuStateMixin')],
 
   getDefaultProps: function getDefaultProps() {
     return {
-      onMouseEnter: _util.noop,
-      onMouseLeave: _util.noop,
-      onTitleMouseEnter: _util.noop,
-      onTitleMouseLeave: _util.noop,
-      onTitleClick: _util.noop,
+      onMouseEnter: noop,
+      onMouseLeave: noop,
+      onTitleMouseEnter: noop,
+      onTitleMouseLeave: noop,
+      onTitleClick: noop,
       title: ''
     };
   },
@@ -107,7 +81,7 @@ var SubMenu = (0, _createReactClass2['default'])({
     var menu = this.menuInstance;
     var isOpen = this.isOpen();
 
-    if (keyCode === _KeyCode2['default'].ENTER) {
+    if (keyCode === KeyCode.ENTER) {
       this.onTitleClick(e);
       this.setState({
         defaultActiveFirst: true
@@ -115,7 +89,7 @@ var SubMenu = (0, _createReactClass2['default'])({
       return true;
     }
 
-    if (keyCode === _KeyCode2['default'].RIGHT) {
+    if (keyCode === KeyCode.RIGHT) {
       if (isOpen) {
         menu.onKeyDown(e);
       } else {
@@ -126,7 +100,7 @@ var SubMenu = (0, _createReactClass2['default'])({
       }
       return true;
     }
-    if (keyCode === _KeyCode2['default'].LEFT) {
+    if (keyCode === KeyCode.LEFT) {
       var handled = void 0;
       if (isOpen) {
         handled = menu.onKeyDown(e);
@@ -140,7 +114,7 @@ var SubMenu = (0, _createReactClass2['default'])({
       return handled;
     }
 
-    if (isOpen && (keyCode === _KeyCode2['default'].UP || keyCode === _KeyCode2['default'].DOWN)) {
+    if (isOpen && (keyCode === KeyCode.UP || keyCode === KeyCode.DOWN)) {
       return menu.onKeyDown(e);
     }
   },
@@ -164,9 +138,7 @@ var SubMenu = (0, _createReactClass2['default'])({
 
     parentMenu.subMenuInstance = this;
     parentMenu.subMenuLeaveFn = function () {
-      // leave whole sub tree
-      // still active
-      if (props.mode !== 'inline') {
+                  if (props.mode !== 'inline') {
         var isOpen = _this.isOpen();
         if (isOpen && props.closeSubMenuOnMouseLeave && props.active) {
           props.onItemHover({
@@ -195,14 +167,12 @@ var SubMenu = (0, _createReactClass2['default'])({
           }
         }
       }
-      // trigger mouseleave
-      props.onMouseLeave({
+            props.onMouseLeave({
         key: eventKey,
         domEvent: e
       });
     };
-    // prevent popup menu and submenu gap
-    parentMenu.subMenuLeaveTimer = setTimeout(parentMenu.subMenuLeaveFn, 100);
+        parentMenu.subMenuLeaveTimer = setTimeout(parentMenu.subMenuLeaveFn, 100);
   },
   onTitleMouseEnter: function onTitleMouseEnter(domEvent) {
     var props = this.props;
@@ -247,9 +217,7 @@ var SubMenu = (0, _createReactClass2['default'])({
 
     parentMenu.subMenuInstance = this;
     parentMenu.subMenuTitleLeaveFn = function () {
-      // leave whole sub tree
-      // still active
-      if (props.mode === 'inline' && props.active) {
+                  if (props.mode === 'inline' && props.active) {
         props.onItemHover({
           key: eventKey,
           item: _this2,
@@ -342,7 +310,7 @@ var SubMenu = (0, _createReactClass2['default'])({
   },
   isChildrenSelected: function isChildrenSelected() {
     var ret = { find: false };
-    (0, _util.loopMenuItemRecusively)(this.props.children, this.props.selectedKeys, ret);
+    loopMenuItemRecusively(this.props.children, this.props.selectedKeys, ret);
     return ret.find;
   },
   isOpen: function isOpen() {
@@ -374,8 +342,8 @@ var SubMenu = (0, _createReactClass2['default'])({
       ref: this.saveMenuInstance,
       count: props.count
     };
-    return _react2['default'].createElement(
-      _SubPopupMenu2['default'],
+    return React.createElement(
+      SubPopupMenu,
       baseProps,
       children
     );
@@ -415,8 +383,7 @@ var SubMenu = (0, _createReactClass2['default'])({
       titleClickEvents = {
         onClick: this.onTitleClick
       };
-      // only works in title, not outer li
-      titleMouseEvents = {
+            titleMouseEvents = {
         onMouseEnter: this.onTitleMouseEnter,
         onMouseLeave: this.onTitleMouseLeave
       };
@@ -425,10 +392,10 @@ var SubMenu = (0, _createReactClass2['default'])({
     if (props.mode === 'inline') {
       style.paddingLeft = props.inlineIndent * props.level;
     }
-    return _react2['default'].createElement(
+    return React.createElement(
       'li',
-      _extends({ className: (0, _classnames2['default'])(classes) }, mouseEvents),
-      _react2['default'].createElement(
+      _extends({ className: classnames(classes) }, mouseEvents),
+      React.createElement(
         'div',
         _extends({
           style: style,
@@ -440,7 +407,7 @@ var SubMenu = (0, _createReactClass2['default'])({
           title: typeof props.title === 'string' ? props.title : undefined
         }),
         props.title,
-        _react2['default'].createElement('i', { className: prefixCls + '-arrow' })
+        React.createElement('i', { className: prefixCls + '-arrow' })
       ),
       this.renderChildren(props.children)
     );
@@ -449,5 +416,4 @@ var SubMenu = (0, _createReactClass2['default'])({
 
 SubMenu.isSubMenu = 1;
 
-exports['default'] = SubMenu;
-module.exports = exports['default'];
+export default SubMenu;

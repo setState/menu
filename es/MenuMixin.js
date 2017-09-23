@@ -1,48 +1,16 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _propTypes = require('prop-types');
-
-var _propTypes2 = _interopRequireDefault(_propTypes);
-
-var _reactDom = require('react-dom');
-
-var _reactDom2 = _interopRequireDefault(_reactDom);
-
-var _KeyCode = require('rc-util/lib/KeyCode');
-
-var _KeyCode2 = _interopRequireDefault(_KeyCode);
-
-var _createChainedFunction = require('rc-util/lib/createChainedFunction');
-
-var _createChainedFunction2 = _interopRequireDefault(_createChainedFunction);
-
-var _classnames = require('classnames');
-
-var _classnames2 = _interopRequireDefault(_classnames);
-
-var _domScrollIntoView = require('dom-scroll-into-view');
-
-var _domScrollIntoView2 = _interopRequireDefault(_domScrollIntoView);
-
-var _util = require('./util');
-
-var _DOMWrap = require('./DOMWrap');
-
-var _DOMWrap2 = _interopRequireDefault(_DOMWrap);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+import React from 'react';
+import PropTypes from 'prop-types';
+import ReactDOM from 'react-dom';
+import KeyCode from 'rc-util/es/KeyCode';
+import createChainedFunction from 'rc-util/lib/createChainedFunction';
+import classnames from 'classnames';
+import scrollIntoView from 'dom-scroll-into-view';
+import { getKeyFromChildrenIndex, loopMenuItem } from './util';
+import DOMWrap from './DOMWrap';
 
 function allDisabled(arr) {
   if (!arr.length) {
@@ -60,8 +28,8 @@ function getActiveKey(props, originalActiveKey) {
 
   if (activeKey) {
     var found = void 0;
-    (0, _util.loopMenuItem)(children, function (c, i) {
-      if (c && !c.props.disabled && activeKey === (0, _util.getKeyFromChildrenIndex)(c, eventKey, i)) {
+    loopMenuItem(children, function (c, i) {
+      if (c && !c.props.disabled && activeKey === getKeyFromChildrenIndex(c, eventKey, i)) {
         found = true;
       }
     });
@@ -71,9 +39,9 @@ function getActiveKey(props, originalActiveKey) {
   }
   activeKey = null;
   if (props.defaultActiveFirst) {
-    (0, _util.loopMenuItem)(children, function (c, i) {
+    loopMenuItem(children, function (c, i) {
       if (!activeKey && c && !c.props.disabled) {
-        activeKey = (0, _util.getKeyFromChildrenIndex)(c, eventKey, i);
+        activeKey = getKeyFromChildrenIndex(c, eventKey, i);
       }
     });
     return activeKey;
@@ -94,17 +62,17 @@ function saveRef(index, subIndex, c) {
 
 var MenuMixin = {
   propTypes: {
-    focusable: _propTypes2['default'].bool,
-    multiple: _propTypes2['default'].bool,
-    style: _propTypes2['default'].object,
-    defaultActiveFirst: _propTypes2['default'].bool,
-    visible: _propTypes2['default'].bool,
-    activeKey: _propTypes2['default'].string,
-    selectedKeys: _propTypes2['default'].arrayOf(_propTypes2['default'].string),
-    defaultSelectedKeys: _propTypes2['default'].arrayOf(_propTypes2['default'].string),
-    defaultOpenKeys: _propTypes2['default'].arrayOf(_propTypes2['default'].string),
-    openKeys: _propTypes2['default'].arrayOf(_propTypes2['default'].string),
-    children: _propTypes2['default'].any
+    focusable: PropTypes.bool,
+    multiple: PropTypes.bool,
+    style: PropTypes.object,
+    defaultActiveFirst: PropTypes.bool,
+    visible: PropTypes.bool,
+    activeKey: PropTypes.string,
+    selectedKeys: PropTypes.arrayOf(PropTypes.string),
+    defaultSelectedKeys: PropTypes.arrayOf(PropTypes.string),
+    defaultOpenKeys: PropTypes.arrayOf(PropTypes.string),
+    openKeys: PropTypes.arrayOf(PropTypes.string),
+    children: PropTypes.any
   },
 
   getDefaultProps: function getDefaultProps() {
@@ -134,8 +102,7 @@ var MenuMixin = {
     } else {
       var originalActiveKey = this.state.activeKey;
       var activeKey = getActiveKey(nextProps, originalActiveKey);
-      // fix: this.setState(), parent.render(),
-      if (activeKey !== originalActiveKey) {
+            if (activeKey !== originalActiveKey) {
         props = {
           activeKey: activeKey
         };
@@ -153,8 +120,7 @@ var MenuMixin = {
   },
 
 
-  // all keyboard events callbacks run from here at first
-  onKeyDown: function onKeyDown(e, callback) {
+    onKeyDown: function onKeyDown(e, callback) {
     var _this = this;
 
     var keyCode = e.keyCode;
@@ -168,15 +134,15 @@ var MenuMixin = {
       return 1;
     }
     var activeItem = null;
-    if (keyCode === _KeyCode2['default'].UP || keyCode === _KeyCode2['default'].DOWN) {
-      activeItem = this.step(keyCode === _KeyCode2['default'].UP ? -1 : 1);
+    if (keyCode === KeyCode.UP || keyCode === KeyCode.DOWN) {
+      activeItem = this.step(keyCode === KeyCode.UP ? -1 : 1);
     }
     if (activeItem) {
       e.preventDefault();
       this.setState({
         activeKey: activeItem.props.eventKey
       }, function () {
-        (0, _domScrollIntoView2['default'])(_reactDom2['default'].findDOMNode(activeItem), _reactDom2['default'].findDOMNode(_this), {
+        scrollIntoView(ReactDOM.findDOMNode(activeItem), ReactDOM.findDOMNode(_this), {
           onlyScrollIfNeeded: true
         });
         if (callback) {
@@ -204,11 +170,8 @@ var MenuMixin = {
         activeKey: hover ? key : null
       });
     } else {}
-    // keep active for sub menu for click active
-    // empty
-
-    // clear last open status
-    if (hover && mode !== 'inline') {
+        
+        if (hover && mode !== 'inline') {
       var activeItem = this.getFlatInstanceArray().filter(function (c) {
         return c && c.props.eventKey === activeKey;
       })[0];
@@ -244,7 +207,7 @@ var MenuMixin = {
   renderCommonMenuItem: function renderCommonMenuItem(child, i, subIndex, extraProps) {
     var state = this.state;
     var props = this.props;
-    var key = (0, _util.getKeyFromChildrenIndex)(child, props.eventKey, i);
+    var key = getKeyFromChildrenIndex(child, props.eventKey, i);
     var childProps = child.props;
     var isActive = key === state.activeKey;
     var newChildProps = _extends({
@@ -255,7 +218,7 @@ var MenuMixin = {
       rootPrefixCls: props.prefixCls,
       index: i,
       parentMenu: this,
-      ref: childProps.disabled ? undefined : (0, _createChainedFunction2['default'])(child.ref, saveRef.bind(this, i, subIndex)),
+      ref: childProps.disabled ? undefined : createChainedFunction(child.ref, saveRef.bind(this, i, subIndex)),
       eventKey: key,
       closeSubMenuOnMouseLeave: props.closeSubMenuOnMouseLeave,
       onItemHover: this.onItemHover,
@@ -272,7 +235,7 @@ var MenuMixin = {
     if (props.mode === 'inline') {
       newChildProps.closeSubMenuOnMouseLeave = newChildProps.openSubMenuOnMouseEnter = false;
     }
-    return _react2['default'].cloneElement(child, newChildProps);
+    return React.cloneElement(child, newChildProps);
   },
   renderRoot: function renderRoot(props) {
     var _classes;
@@ -280,7 +243,7 @@ var MenuMixin = {
     this.instanceArray = [];
     var classes = (_classes = {}, _defineProperty(_classes, props.prefixCls, 1), _defineProperty(_classes, props.prefixCls + '-' + props.mode, 1), _defineProperty(_classes, props.className, !!props.className), _classes);
     var domProps = {
-      className: (0, _classnames2['default'])(classes),
+      className: classnames(classes),
       role: 'menu',
       'aria-activedescendant': ''
     };
@@ -292,19 +255,18 @@ var MenuMixin = {
       domProps.onKeyDown = this.onKeyDown;
     }
     return (
-      // ESLint is not smart enough to know that the type of `children` was checked.
-      /* eslint-disable */
-      _react2['default'].createElement(
-        _DOMWrap2['default'],
+            
+      React.createElement(
+        DOMWrap,
         _extends({
           style: props.style,
           tag: 'ul',
           hiddenClassName: props.prefixCls + '-hidden',
           visible: props.visible
         }, domProps),
-        _react2['default'].Children.map(props.children, this.renderMenuItem)
+        React.Children.map(props.children, this.renderMenuItem)
       )
-      /*eslint-enable */
+      
 
     );
   },
@@ -318,8 +280,7 @@ var MenuMixin = {
     if (direction < 0) {
       children = children.concat().reverse();
     }
-    // find current activeIndex
-    var activeIndex = -1;
+        var activeIndex = -1;
     children.every(function (c, ci) {
       if (c && c.props.eventKey === activeKey) {
         activeIndex = ci;
@@ -338,8 +299,7 @@ var MenuMixin = {
       var child = children[i];
       if (!child || child.props.disabled) {
         i = (i + 1 + len) % len;
-        // complete a loop
-        if (i === start) {
+                if (i === start) {
           return null;
         }
       } else {
@@ -349,5 +309,4 @@ var MenuMixin = {
   }
 };
 
-exports['default'] = MenuMixin;
-module.exports = exports['default'];
+export default MenuMixin;

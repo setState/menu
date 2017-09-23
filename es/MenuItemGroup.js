@@ -1,31 +1,15 @@
-'use strict';
+import React from 'react';
+import PropTypes from 'prop-types';
+import createReactClass from 'create-react-class';
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _propTypes = require('prop-types');
-
-var _propTypes2 = _interopRequireDefault(_propTypes);
-
-var _createReactClass = require('create-react-class');
-
-var _createReactClass2 = _interopRequireDefault(_createReactClass);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-var MenuItemGroup = (0, _createReactClass2['default'])({
+var MenuItemGroup = createReactClass({
   displayName: 'MenuItemGroup',
 
   propTypes: {
-    renderMenuItem: _propTypes2['default'].func,
-    index: _propTypes2['default'].number,
-    className: _propTypes2['default'].string,
-    rootPrefixCls: _propTypes2['default'].string
+    renderMenuItem: PropTypes.func,
+    index: PropTypes.number,
+    className: PropTypes.string,
+    rootPrefixCls: PropTypes.string
   },
 
   getDefaultProps: function getDefaultProps() {
@@ -48,10 +32,10 @@ var MenuItemGroup = (0, _createReactClass2['default'])({
 
     var titleClassName = rootPrefixCls + '-item-group-title';
     var listClassName = rootPrefixCls + '-item-group-list';
-    return _react2['default'].createElement(
+    return React.createElement(
       'li',
       { className: className + ' ' + rootPrefixCls + '-item-group' },
-      _react2['default'].createElement(
+      React.createElement(
         'div',
         {
           className: titleClassName,
@@ -59,10 +43,10 @@ var MenuItemGroup = (0, _createReactClass2['default'])({
         },
         props.title
       ),
-      _react2['default'].createElement(
+      React.createElement(
         'ul',
         { className: listClassName },
-        _react2['default'].Children.map(props.children, this.renderInnerMenuItem)
+        React.Children.map(props.children, this.renderInnerMenuItem)
       )
     );
   }
@@ -70,5 +54,4 @@ var MenuItemGroup = (0, _createReactClass2['default'])({
 
 MenuItemGroup.isMenuItemGroup = true;
 
-exports['default'] = MenuItemGroup;
-module.exports = exports['default'];
+export default MenuItemGroup;

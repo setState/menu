@@ -1,28 +1,9 @@
-'use strict';
+import KeyCode from 'rc-util/es/KeyCode';
+import addEventListener from 'rc-util/lib/Dom/addEventListener';
+import contains from 'rc-util/lib/Dom/contains';
+import ReactDOM from 'react-dom';
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _KeyCode = require('rc-util/lib/KeyCode');
-
-var _KeyCode2 = _interopRequireDefault(_KeyCode);
-
-var _addEventListener = require('rc-util/lib/Dom/addEventListener');
-
-var _addEventListener2 = _interopRequireDefault(_addEventListener);
-
-var _contains = require('rc-util/lib/Dom/contains');
-
-var _contains2 = _interopRequireDefault(_contains);
-
-var _reactDom = require('react-dom');
-
-var _reactDom2 = _interopRequireDefault(_reactDom);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-exports['default'] = {
+export default {
   componentDidMount: function componentDidMount() {
     this.componentDidUpdate();
   },
@@ -36,7 +17,7 @@ exports['default'] = {
     }
   },
   handleDocumentKeyUp: function handleDocumentKeyUp(e) {
-    if (e.keyCode === _KeyCode2['default'].ESC) {
+    if (e.keyCode === KeyCode.ESC) {
       this.props.onItemHover({
         key: this.props.eventKey,
         item: this,
@@ -45,9 +26,7 @@ exports['default'] = {
     }
   },
   handleDocumentClick: function handleDocumentClick(e) {
-    // If the click originated from within this component
-    // don't do anything.
-    if ((0, _contains2['default'])(_reactDom2['default'].findDOMNode(this), e.target)) {
+            if (contains(ReactDOM.findDOMNode(this), e.target)) {
       return;
     }
     var props = this.props;
@@ -60,8 +39,8 @@ exports['default'] = {
   },
   bindRootCloseHandlers: function bindRootCloseHandlers() {
     if (!this._onDocumentClickListener) {
-      this._onDocumentClickListener = (0, _addEventListener2['default'])(document, 'click', this.handleDocumentClick);
-      this._onDocumentKeyupListener = (0, _addEventListener2['default'])(document, 'keyup', this.handleDocumentKeyUp);
+      this._onDocumentClickListener = addEventListener(document, 'click', this.handleDocumentClick);
+      this._onDocumentKeyupListener = addEventListener(document, 'keyup', this.handleDocumentKeyUp);
     }
   },
   unbindRootCloseHandlers: function unbindRootCloseHandlers() {
@@ -79,4 +58,3 @@ exports['default'] = {
     this.unbindRootCloseHandlers();
   }
 };
-module.exports = exports['default'];

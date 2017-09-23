@@ -1,63 +1,40 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _react = require('react');
+import React from 'react';
+import PropTypes from 'prop-types';
+import createReactClass from 'create-react-class';
+import KeyCode from 'rc-util/es/KeyCode';
+import classnames from 'classnames';
+import { noop } from './util';
 
-var _react2 = _interopRequireDefault(_react);
 
-var _propTypes = require('prop-types');
 
-var _propTypes2 = _interopRequireDefault(_propTypes);
-
-var _createReactClass = require('create-react-class');
-
-var _createReactClass2 = _interopRequireDefault(_createReactClass);
-
-var _KeyCode = require('rc-util/lib/KeyCode');
-
-var _KeyCode2 = _interopRequireDefault(_KeyCode);
-
-var _classnames = require('classnames');
-
-var _classnames2 = _interopRequireDefault(_classnames);
-
-var _util = require('./util');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-/* eslint react/no-is-mounted:0 */
-
-var MenuItem = (0, _createReactClass2['default'])({
+var MenuItem = createReactClass({
   displayName: 'MenuItem',
 
   propTypes: {
-    rootPrefixCls: _propTypes2['default'].string,
-    eventKey: _propTypes2['default'].string,
-    active: _propTypes2['default'].bool,
-    children: _propTypes2['default'].any,
-    selectedKeys: _propTypes2['default'].array,
-    disabled: _propTypes2['default'].bool,
-    title: _propTypes2['default'].string,
-    onSelect: _propTypes2['default'].func,
-    onClick: _propTypes2['default'].func,
-    onDeselect: _propTypes2['default'].func,
-    parentMenu: _propTypes2['default'].object,
-    onItemHover: _propTypes2['default'].func,
-    onDestroy: _propTypes2['default'].func,
-    onMouseEnter: _propTypes2['default'].func,
-    onMouseLeave: _propTypes2['default'].func
+    rootPrefixCls: PropTypes.string,
+    eventKey: PropTypes.string,
+    active: PropTypes.bool,
+    children: PropTypes.any,
+    selectedKeys: PropTypes.array,
+    disabled: PropTypes.bool,
+    title: PropTypes.string,
+    onSelect: PropTypes.func,
+    onClick: PropTypes.func,
+    onDeselect: PropTypes.func,
+    parentMenu: PropTypes.object,
+    onItemHover: PropTypes.func,
+    onDestroy: PropTypes.func,
+    onMouseEnter: PropTypes.func,
+    onMouseLeave: PropTypes.func
   },
 
   getDefaultProps: function getDefaultProps() {
     return {
-      onSelect: _util.noop,
-      onMouseEnter: _util.noop,
-      onMouseLeave: _util.noop
+      onSelect: noop,
+      onMouseEnter: noop,
+      onMouseLeave: noop
     };
   },
   componentWillUnmount: function componentWillUnmount() {
@@ -71,7 +48,7 @@ var MenuItem = (0, _createReactClass2['default'])({
   },
   onKeyDown: function onKeyDown(e) {
     var keyCode = e.keyCode;
-    if (keyCode === _KeyCode2['default'].ENTER) {
+    if (keyCode === KeyCode.ENTER) {
       this.onClick(e);
       return true;
     }
@@ -178,7 +155,7 @@ var MenuItem = (0, _createReactClass2['default'])({
     classes[props.className] = !!props.className;
     var attrs = _extends({}, props.attribute, {
       title: props.title,
-      className: (0, _classnames2['default'])(classes),
+      className: classnames(classes),
       role: 'menuitem',
       'aria-selected': selected,
       'aria-disabled': props.disabled
@@ -195,7 +172,7 @@ var MenuItem = (0, _createReactClass2['default'])({
     if (props.mode === 'inline') {
       style.paddingLeft = props.inlineIndent * props.level;
     }
-    return _react2['default'].createElement(
+    return React.createElement(
       'li',
       _extends({
         style: style
@@ -207,5 +184,4 @@ var MenuItem = (0, _createReactClass2['default'])({
 
 MenuItem.isMenuItem = 1;
 
-exports['default'] = MenuItem;
-module.exports = exports['default'];
+export default MenuItem;

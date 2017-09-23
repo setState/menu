@@ -1,53 +1,31 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _react = require('react');
+import React from 'react';
+import PropTypes from 'prop-types';
+import createReactClass from 'create-react-class';
+import MenuMixin from './MenuMixin';
+import Animate from 'rc-animate';
 
-var _react2 = _interopRequireDefault(_react);
-
-var _propTypes = require('prop-types');
-
-var _propTypes2 = _interopRequireDefault(_propTypes);
-
-var _createReactClass = require('create-react-class');
-
-var _createReactClass2 = _interopRequireDefault(_createReactClass);
-
-var _MenuMixin = require('./MenuMixin');
-
-var _MenuMixin2 = _interopRequireDefault(_MenuMixin);
-
-var _rcAnimate = require('rc-animate');
-
-var _rcAnimate2 = _interopRequireDefault(_rcAnimate);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-var SubPopupMenu = (0, _createReactClass2['default'])({
+var SubPopupMenu = createReactClass({
   displayName: 'SubPopupMenu',
 
   propTypes: {
-    onSelect: _propTypes2['default'].func,
-    onClick: _propTypes2['default'].func,
-    onDeselect: _propTypes2['default'].func,
-    onOpenChange: _propTypes2['default'].func,
-    onDestroy: _propTypes2['default'].func,
-    openTransitionName: _propTypes2['default'].string,
-    openAnimation: _propTypes2['default'].oneOfType([_propTypes2['default'].string, _propTypes2['default'].object]),
-    openKeys: _propTypes2['default'].arrayOf(_propTypes2['default'].string),
-    closeSubMenuOnMouseLeave: _propTypes2['default'].bool,
-    visible: _propTypes2['default'].bool,
-    children: _propTypes2['default'].any
+    onSelect: PropTypes.func,
+    onClick: PropTypes.func,
+    onDeselect: PropTypes.func,
+    onOpenChange: PropTypes.func,
+    onDestroy: PropTypes.func,
+    openTransitionName: PropTypes.string,
+    openAnimation: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+    openKeys: PropTypes.arrayOf(PropTypes.string),
+    closeSubMenuOnMouseLeave: PropTypes.bool,
+    visible: PropTypes.bool,
+    children: PropTypes.any
   },
 
-  mixins: [_MenuMixin2['default']],
+  mixins: [MenuMixin],
 
   onDeselect: function onDeselect(selectInfo) {
     this.props.onDeselect(selectInfo);
@@ -139,8 +117,8 @@ var SubPopupMenu = (0, _createReactClass2['default'])({
 
     props.style = style;
 
-    return _react2['default'].createElement(
-      _rcAnimate2['default'],
+    return React.createElement(
+      Animate,
       _extends({}, animProps, {
         showProp: 'visible',
         component: '',
@@ -151,5 +129,4 @@ var SubPopupMenu = (0, _createReactClass2['default'])({
   }
 });
 
-exports['default'] = SubPopupMenu;
-module.exports = exports['default'];
+export default SubPopupMenu;
