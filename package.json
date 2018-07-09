@@ -1,5 +1,5 @@
 {
-  "name": "rc-menu",
+  "name": "@unovo/rc-menu",
   "version": "5.1.2",
   "description": "menu ui component for react",
   "keywords": [
@@ -40,7 +40,6 @@
     "lint": "rc-tools run lint",
     "lint:fix": "rc-tools run lint --fix",
     "test": "jest",
-    "prepublish": "rc-tools run guard",
     "coverage": "jest --coverage && cat ./coverage/lcov.info | coveralls"
   },
   "jest": {
