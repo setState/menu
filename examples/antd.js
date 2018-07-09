@@ -5,11 +5,10 @@ import ReactDOM from 'react-dom';
 import Menu, { SubMenu, Item as MenuItem, Divider } from 'rc-menu';
 import 'rc-menu/assets/index.less';
 import animate from 'css-animation';
-import createReactClass from 'create-react-class';
 
-function handleSelect(info) {
+function handleClick(info) {
+  console.log(`clicked ${info.key}`);
   console.log(info);
-  console.log(`selected ${info.key}`);
 }
 
 const animation = {
@@ -52,7 +51,7 @@ const animation = {
 
 const reactContainer = document.getElementById('__react-content');
 
-const nestSubMenu = (<SubMenu title={<span>sub menu 2</span>} key="4">
+const nestSubMenu = (<SubMenu title={<span>offset sub menu 2</span>} key="4" popupOffset={[10, 15]}>
   <MenuItem key="4-1">inner inner</MenuItem>
   <Divider/>
   <SubMenu
@@ -78,7 +77,7 @@ const nestSubMenu = (<SubMenu title={<span>sub menu 2</span>} key="4">
 function onOpenChange(value) {
   console.log('onOpenChange', value);
 }
-const commonMenu = (<Menu onSelect={handleSelect} onOpenChange={onOpenChange}>
+const commonMenu = (<Menu onClick={handleClick} onOpenChange={onOpenChange}>
   <SubMenu title={<span>sub menu</span>} key="1">
     <MenuItem key="1-1">0-1</MenuItem>
     <MenuItem key="1-2">0-2</MenuItem>
@@ -88,18 +87,6 @@ const commonMenu = (<Menu onSelect={handleSelect} onOpenChange={onOpenChange}>
   <MenuItem key="3">outer</MenuItem>
   <MenuItem disabled>disabled</MenuItem>
   <MenuItem key="5">outer3</MenuItem>
-</Menu>);
-
-const subMenus = (<Menu onSelect={handleSelect}>
-  <SubMenu title={<span>sub menu</span>} key="1">
-    <MenuItem key="1-1">0-1</MenuItem>
-    <MenuItem key="1-2">0-2</MenuItem>
-  </SubMenu>
-  <SubMenu title={<span>sub menu 1</span>} key="2">
-    <MenuItem key="2-1">2-1</MenuItem>
-    <MenuItem key="2-2">2-2</MenuItem>
-  </SubMenu>
-  {nestSubMenu}
 </Menu>);
 
 function render(container) {
@@ -112,7 +99,7 @@ function render(container) {
   const horizontalMenu2 = React.cloneElement(commonMenu, {
     mode: 'horizontal',
     openAnimation: 'slide-up',
-    closeSubMenuOnMouseLeave: false,
+    triggerSubMenuAction: 'click',
   });
 
   const verticalMenu = React.cloneElement(commonMenu, {
@@ -126,30 +113,6 @@ function render(container) {
     openAnimation: animation,
   });
 
-  const ClickToHideMenu = createReactClass({
-    getInitialState() {
-      return {
-        openKeys: [],
-      };
-    },
-    onOpenChange(openKeys) {
-      this.setState({
-        openKeys,
-      });
-    },
-
-    render() {
-      return React.cloneElement(subMenus, {
-        onOpenChange: this.onOpenChange,
-        openKeys: this.state.openKeys,
-        mode: 'horizontal',
-        openAnimation: 'slide-up',
-        openSubMenuOnMouseEnter: false,
-        closeSubMenuOnMouseLeave: false,
-      });
-    },
-  });
-
   ReactDOM.render(<div style={{ margin: 20 }}>
     <h2>antd menu</h2>
 
@@ -157,12 +120,9 @@ function render(container) {
       <h3>horizontal</h3>
 
       <div style={{ margin: 20, width: 800 }}>{horizontalMenu}</div>
-      <h3>horizontal keep open</h3>
-
-      <div style={{ margin: 20, width: 800 }}>{horizontalMenu2}</div>
       <h3>horizontal and click</h3>
 
-      <div style={{ margin: 20, width: 800 }}><ClickToHideMenu /></div>
+      <div style={{ margin: 20, width: 800 }}>{horizontalMenu2}</div>
       <h3>vertical</h3>
 
       <div style={{ margin: 20, width: 200 }}>{verticalMenu}</div>

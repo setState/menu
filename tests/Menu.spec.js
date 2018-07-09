@@ -1,4 +1,4 @@
-/* eslint-disable no-undef */
+/* eslint-disable no-undef, react/no-multi-comp */
 import React from 'react';
 import { render, mount } from 'enzyme';
 import { renderToJson } from 'enzyme-to-json';
@@ -33,12 +33,32 @@ describe('Menu', () => {
 
     ['vertical', 'horizontal', 'inline'].forEach((mode) => {
       it(`renders ${mode} menu correctly`, () => {
-        const wrapper = render(createMenu({ [mode]: true }));
+        const wrapper = render(createMenu({ mode }));
         expect(renderToJson(wrapper)).toMatchSnapshot();
       });
     });
   });
 
+  describe('render role listbox', () => {
+    function createMenu() {
+      return (
+        <Menu
+          className="myMenu"
+          openAnimation="fade"
+          role="listbox"
+        >
+          <MenuItem key="1" role="option">1</MenuItem>
+          <MenuItem key="2" role="option">2</MenuItem>
+          <MenuItem key="3" role="option">3</MenuItem>
+        </Menu>
+      );
+    }
+
+    it(`renders menu correctly`, () => {
+      const wrapper = render(createMenu());
+      expect(renderToJson(wrapper)).toMatchSnapshot();
+    });
+  });
 
   it('set activeKey', () => {
     const wrapper = mount(
@@ -83,6 +103,7 @@ describe('Menu', () => {
     );
     expect(wrapper.find('li').first().props().className).toContain('-selected');
     wrapper.setProps({ selectedKeys: ['2'] });
+    wrapper.update();
     expect(wrapper.find('li').last().props().className).toContain('-selected');
   });
 
@@ -170,8 +191,9 @@ describe('Menu', () => {
         <MenuItem key="item2">item2</MenuItem>
       </Menu>
     );
-    const menuItem = wrapper.find('MenuItem').last();
+    let menuItem = wrapper.find('MenuItem').last();
     menuItem.simulate('mouseEnter');
+    menuItem = wrapper.find('MenuItem').last();
     expect(menuItem.props().active).toBe(true);
   });
 
@@ -185,5 +207,85 @@ describe('Menu', () => {
 
     wrapper.simulate('keyDown', { keyCode: KeyCode.DOWN });
     expect(wrapper.find('MenuItem').at(1).props().active).toBe(true);
+  });
+
+  it('keydown works when children change', () => {
+    class App extends React.Component {
+      state = {
+        items: [1, 2, 3],
+      }
+
+      render() {
+        return (
+          <Menu>
+            {this.state.items.map(i =>
+              <MenuItem key={i}>{i}</MenuItem>
+            )}
+          </Menu>
+        );
+      }
+    }
+
+    const wrapper = mount(<App />);
+
+    wrapper.setState({ items: [0, 1] });
+
+    wrapper.find('Menu').simulate('keyDown', { keyCode: KeyCode.DOWN });
+    expect(wrapper.find('MenuItem').at(0).props().active).toBe(true);
+
+    wrapper.find('Menu').simulate('keyDown', { keyCode: KeyCode.DOWN });
+    expect(wrapper.find('MenuItem').at(1).props().active).toBe(true);
+  });
+
+  it('active first item when children changes', () => {
+    class App extends React.Component {
+      state = {
+        items: ['foo'],
+      }
+
+      render() {
+        return (
+          <Menu defaultActiveFirst activeKey="" selectedKeys={['foo']}>
+            {this.state.items.map(item =>
+              <MenuItem key={item}>{item}</MenuItem>
+            )}
+          </Menu>
+        );
+      }
+    }
+
+    const wrapper = mount(<App />);
+
+    wrapper.setState({ items: ['bar', 'foo'] });
+    wrapper.update();
+
+    expect(
+      wrapper.find('li').first().hasClass('rc-menu-item-active')
+    ).toBe(true);
+  });
+
+  it('should accept builtinPlacements', () => {
+    const builtinPlacements = {
+      leftTop: {
+        points: ['tr', 'tl'],
+        overflow: {
+          adjustX: 0,
+          adjustY: 0,
+        },
+        offset: [0, 0],
+      },
+    };
+
+    const wrapper = mount(
+      <Menu builtinPlacements={builtinPlacements}>
+        <MenuItem>menuItem</MenuItem>
+        <SubMenu title="submenu">
+          <MenuItem>menuItem</MenuItem>
+        </SubMenu>
+      </Menu>
+    );
+
+    expect(wrapper.find('Trigger').prop('builtinPlacements').leftTop)
+      .toEqual(builtinPlacements.leftTop);
   });
 });
