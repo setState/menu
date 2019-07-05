@@ -1,3 +1,7 @@
+jest.mock('mutationobserver-shim');
+
+const mockedUtil = require('../src/util');
+
 /* eslint-disable no-undef, react/no-multi-comp */
 import React from 'react';
 import { render, mount } from 'enzyme';
@@ -6,7 +10,7 @@ import KeyCode from 'rc-util/lib/KeyCode';
 import Menu, { MenuItem, MenuItemGroup, SubMenu, Divider } from '../src';
 
 describe('Menu', () => {
-  describe('render', () => {
+  describe('should render', () => {
     function createMenu(props) {
       return (
         <Menu
@@ -32,9 +36,21 @@ describe('Menu', () => {
     }
 
     ['vertical', 'horizontal', 'inline'].forEach((mode) => {
-      it(`renders ${mode} menu correctly`, () => {
+      it(`${mode} menu correctly`, () => {
         const wrapper = render(createMenu({ mode }));
         expect(renderToJson(wrapper)).toMatchSnapshot();
+      });
+
+      it(`${mode} menu with empty children without error`, () => {
+        expect(() => render(<Menu mode={mode}>{[]}</Menu>)).not.toThrow();
+      });
+
+      it(`${mode} menu with undefined children without error`, () => {
+        expect(() => render(<Menu mode={mode} />)).not.toThrow();
+      });
+
+      it(`${mode} menu that has a submenu with undefined children without error`, () => {
+        expect(() => render(<Menu mode={mode}><SubMenu /></Menu>)).not.toThrow();
       });
     });
   });
@@ -79,6 +95,24 @@ describe('Menu', () => {
       </Menu>
     );
     expect(wrapper.find('MenuItem').first().props().active).toBe(true);
+  });
+
+  it('should render none menu item children', () => {
+    expect(() => {
+      mount(
+        <Menu activeKey="1">
+          <MenuItem key="1">1</MenuItem>
+          <MenuItem key="2">2</MenuItem>
+          string
+          {'string'}
+          {null}
+          {undefined}
+          {12345}
+          <div />
+          <input />
+        </Menu>
+      );
+    }).not.toThrow();
   });
 
   it('select multiple items', () => {
@@ -287,5 +321,133 @@ describe('Menu', () => {
 
     expect(wrapper.find('Trigger').prop('builtinPlacements').leftTop)
       .toEqual(builtinPlacements.leftTop);
+  });
+
+  describe('submenu mode', () => {
+    it('should use menu mode by default', () => {
+      const wrapper = mount(
+        <Menu mode="horizontal">
+          <SubMenu title="submenu">
+            <MenuItem>menuItem</MenuItem>
+          </SubMenu>
+        </Menu>
+      );
+
+      expect(wrapper.find('SubMenu').first().prop('mode')).toEqual('horizontal');
+    });
+
+    it('should be able to customize SubMenu mode', () => {
+      const wrapper = mount(
+        <Menu mode="horizontal">
+          <SubMenu title="submenu" mode="vertical-right">
+            <MenuItem>menuItem</MenuItem>
+          </SubMenu>
+        </Menu>
+      );
+
+      expect(wrapper.find('SubMenu').first().prop('mode')).toEqual('vertical-right');
+    });
+  });
+
+  describe('DOMWrap Allow Overflow', () => {
+    const overflowIndicatorSelector = 'SubMenu.rc-menu-overflowed-submenu';
+    function createMenu(props) {
+      return (
+        <Menu
+          mode="horizontal"
+          className="myMenu"
+          openAnimation="fade"
+          overflowedIndicator={<div className="test-overflow-indicator">...</div>}
+          {...props}
+        >
+          <MenuItem key="1">1</MenuItem>
+          <MenuItem key="2" disabled>2</MenuItem>
+          <MenuItem key="3">3</MenuItem>
+          <MenuItem key="4">4</MenuItem>
+        </Menu>
+      );
+    }
+
+    let wrapper;
+
+    it('should not include overflow indicator when having enough width', () => {
+      const indicatorWidth = 50; // actual width including 40 px padding, which will be 50;
+      const liWidths = [50, 50, 50, 50];
+      const availableWidth = 250;
+      const widths = [...liWidths, indicatorWidth, availableWidth];
+      let i = 0;
+      mockedUtil.getWidth = () => {
+        return widths[i++];
+      };
+      wrapper = mount(createMenu());
+
+      // overflow indicator placeholder
+      expect(wrapper.find(overflowIndicatorSelector).at(4).prop('style')).toEqual({
+        visibility: 'hidden',
+        position: 'absolute',
+      });
+
+      // last overflow indicator should be hidden
+      expect(wrapper.find(overflowIndicatorSelector).at(3).prop('style')).toEqual({
+        display: 'none',
+      });
+
+      expect(wrapper.find('MenuItem li').at(0).prop('style')).toEqual({});
+      expect(wrapper.find('MenuItem li').at(1).prop('style')).toEqual({});
+      expect(wrapper.find('MenuItem li').at(2).prop('style')).toEqual({});
+      expect(wrapper.find('MenuItem li').at(3).prop('style')).toEqual({});
+    });
+
+    it('should include overflow indicator when having not enough width', () => {
+      const indicatorWidth = 5; // actual width including 40 px padding, which will be 45;
+      const liWidths = [50, 50, 50, 50];
+      const availableWidth = 145;
+      const widths = [...liWidths, indicatorWidth, availableWidth];
+      let i = 0;
+      mockedUtil.getWidth = () => {
+        return widths[i++];
+      };
+      wrapper = mount(createMenu());
+
+      expect(wrapper.find('MenuItem li').at(0).prop('style')).toEqual({});
+      expect(wrapper.find('MenuItem li').at(1).prop('style')).toEqual({});
+      expect(wrapper.find('MenuItem li').at(2).prop('style')).toEqual({ display: 'none' });
+      expect(wrapper.find('MenuItem li').at(3).prop('style')).toEqual({ display: 'none' });
+
+      expect(wrapper.find(overflowIndicatorSelector).at(2).prop('style')).toEqual({});
+      expect(wrapper.find(overflowIndicatorSelector).at(3).prop('style')).toEqual({
+        display: 'none',
+      });
+    });
+
+    describe('props changes', () => {
+      it('should recalculate overflow on children length changes', () => {
+        const liWidths = [50, 50, 50, 50];
+        const availableWidth = 145;
+        const indicatorWidth = 45;
+        const widths = [...liWidths, indicatorWidth, availableWidth];
+        let i = 0;
+
+        mockedUtil.getWidth = () => {
+          return widths[i++];
+        };
+
+        wrapper = mount(createMenu());
+
+        expect(wrapper.find(overflowIndicatorSelector).length).toEqual(5);
+        expect(wrapper.find(overflowIndicatorSelector).at(1).prop('style')).toEqual({
+          display: 'none',
+        });
+        expect(wrapper.find(overflowIndicatorSelector).at(2).prop('style')).toEqual({});
+
+        wrapper.setProps({ children: <MenuItem>child</MenuItem> });
+        wrapper.update();
+
+        expect(wrapper.find(overflowIndicatorSelector).length).toEqual(2);
+        expect(wrapper.find(overflowIndicatorSelector).at(0).prop('style')).toEqual({
+          display: 'none',
+        });
+      });
+    });
   });
 });

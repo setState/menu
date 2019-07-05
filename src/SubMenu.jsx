@@ -63,6 +63,8 @@ export class SubMenu extends React.Component {
     store: PropTypes.object,
     mode: PropTypes.oneOf(['horizontal', 'vertical', 'vertical-left', 'vertical-right', 'inline']),
     manualRef: PropTypes.func,
+    itemIcon: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
+    expandIcon: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
   };
 
   static defaultProps = {
@@ -245,7 +247,11 @@ export class SubMenu extends React.Component {
   };
 
   onSubMenuClick = (info) => {
-    this.props.onClick(this.addKeyPath(info));
+    // in the case of overflowed submenu
+    // onClick is not copied over
+    if (typeof this.props.onClick === 'function') {
+      this.props.onClick(this.addKeyPath(info));
+    }
   };
 
   onSelect = (info) => {
@@ -366,6 +372,8 @@ export class SubMenu extends React.Component {
       prefixCls: props.rootPrefixCls,
       id: this._menuId,
       manualRef: this.saveMenuInstance,
+      itemIcon: props.itemIcon,
+      expandIcon: props.expandIcon,
     };
 
     const haveRendered = this.haveRendered;
@@ -380,7 +388,7 @@ export class SubMenu extends React.Component {
     // don't show transition on first rendering (no animation for opened menu)
     // show appear transition if it's not visible (not sure why)
     // show appear transition if it's not inline mode
-    const transitionAppear = haveRendered || !baseProps.visible || !baseProps.mode === 'inline';
+    const transitionAppear = haveRendered || !baseProps.visible || baseProps.mode !== 'inline';
 
     baseProps.className = ` ${baseProps.prefixCls}-sub`;
     const animProps = {};
@@ -461,6 +469,18 @@ export class SubMenu extends React.Component {
       };
     }
 
+    // expand custom icon should NOT be displayed in menu with horizontal mode.
+    let icon = null;
+    if (props.mode !== 'horizontal') {
+      icon = this.props.expandIcon; // ReactNode
+      if (typeof this.props.expandIcon === 'function') {
+        icon = React.createElement(
+          this.props.expandIcon,
+          { ...this.props }
+        );
+      }
+    }
+
     const title = (
       <div
         ref={this.saveSubMenuTitle}
@@ -474,7 +494,7 @@ export class SubMenu extends React.Component {
         title={typeof props.title === 'string' ? props.title : undefined}
       >
         {props.title}
-        <i className={`${prefixCls}-arrow`} />
+        {icon || <i className={`${prefixCls}-arrow`} />}
       </div>
     );
     const children = this.renderChildren(props.children);

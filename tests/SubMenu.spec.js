@@ -29,6 +29,10 @@ describe('SubMenu', () => {
     );
   }
 
+  function itemIcon() {
+    return <span>MenuItemIcon</span>;
+  }
+
   it('don\'t show submenu when disabled', () => {
     const wrapper = mount(
       <Menu mode="vertical">
@@ -50,8 +54,60 @@ describe('SubMenu', () => {
       </Menu>
     );
 
-    const popupAlign = wrapper.find('Trigger').prop('popupAlign');
+    const popupAlign = wrapper.find('Trigger').first().prop('popupAlign');
     expect(popupAlign).toEqual({ offset: [0, 15] });
+  });
+
+  it('should render custom arrow icon correctly.', () => {
+    const wrapper = mount(
+      <Menu
+        mode="vertical"
+        itemIcon={itemIcon}
+        expandIcon={<span>SubMenuIconNode</span>}
+      >
+        <SubMenu key="s" title="submenu">
+          <MenuItem key="1">1</MenuItem>
+          <MenuItem key="2">2</MenuItem>
+        </SubMenu>
+      </Menu>
+    );
+
+    const wrapperWithExpandIconFunction = mount(
+      <Menu
+        mode="vertical"
+        itemIcon={itemIcon}
+        expandIcon={() => <span>SubMenuIconNode</span>}
+      >
+        <SubMenu key="s" title="submenu">
+          <MenuItem key="1">1</MenuItem>
+          <MenuItem key="2">2</MenuItem>
+        </SubMenu>
+      </Menu>
+    );
+
+    const subMenuText = wrapper.find('.rc-menu-submenu-title').first().text();
+    const subMenuTextWithExpandIconFunction =
+      wrapperWithExpandIconFunction.find('.rc-menu-submenu-title').first().text();
+    expect(subMenuText).toEqual('submenuSubMenuIconNode');
+    expect(subMenuTextWithExpandIconFunction).toEqual('submenuSubMenuIconNode');
+  });
+
+  it('should Not render custom arrow icon in horizontal mode.', () => {
+    const wrapper = mount(
+      <Menu mode="horizontal">
+        <SubMenu
+          key="s"
+          title="submenu"
+          itemIcon={itemIcon}
+          expandIcon={<span>SubMenuIconNode</span>}
+        >
+          <MenuItem key="1">1</MenuItem>
+        </SubMenu>
+      </Menu>
+    );
+
+    const childText = wrapper.find('.rc-menu-submenu-title').at(1).text();
+    expect(childText).toEqual('submenu');
   });
 
   describe('openSubMenuOnMouseEnter and closeSubMenuOnMouseLeave are true', () => {
@@ -283,12 +339,14 @@ describe('SubMenu', () => {
         </Menu>
       );
 
-      const subMenuInstance = wrapper.find('SubMenu').first().instance();
+      // every item has a prefixed overflow indicator as a submenu
+      // so we have to get the 3rd submenu
+      const subMenuInstance = wrapper.find('SubMenu').at(2).instance();
       const adjustWidthSpy = jest.spyOn(subMenuInstance, 'adjustWidth');
 
       jest.runAllTimers();
 
-      expect(adjustWidthSpy).toHaveBeenCalledTimes(2);
+      expect(adjustWidthSpy).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -309,14 +367,14 @@ describe('SubMenu', () => {
       expect(wrapper.find('Animate').prop('transitionName')).toEqual('fade');
     });
 
-    it('should animate on initially opened menu', () => {
+    it('should not animate on initially opened menu', () => {
       const wrapper = mount(createMenu({
         openAnimation: { appear },
         mode: 'inline',
         openKeys: ['s1'],
       }));
 
-      expect(wrapper.find('Animate').first().prop('animation')).toEqual({ appear });
+      expect(wrapper.find('Animate').first().prop('animation')).toEqual({});
     });
 
     it('should animate with config', () => {
@@ -354,6 +412,23 @@ describe('SubMenu', () => {
       wrapper.setProps({ show: false });
 
       expect(onDestroy).toHaveBeenCalledWith('s1');
+    });
+  });
+
+  describe('customizing style', () => {
+    it('should take style prop', () => {
+      const App = () => (
+        <Menu style={{ backgroundColor: 'black' }}>
+          <SubMenu key="s1" title="submenu1">
+            <MenuItem key="s1-1">1</MenuItem>
+          </SubMenu>
+        </Menu>
+      );
+
+      const wrapper = mount(<App show />);
+      expect(wrapper.find('Menu ul').prop('style')).toEqual({
+        backgroundColor: 'black',
+      });
     });
   });
 });

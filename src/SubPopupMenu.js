@@ -4,7 +4,7 @@ import { connect } from 'mini-store';
 import KeyCode from 'rc-util/lib/KeyCode';
 import createChainedFunction from 'rc-util/lib/createChainedFunction';
 import classNames from 'classnames';
-import { getKeyFromChildrenIndex, loopMenuItem, noop, menuAllProps } from './util';
+import { getKeyFromChildrenIndex, loopMenuItem, noop, menuAllProps, isMobileDevice } from './util';
 import DOMWrap from './DOMWrap';
 
 function allDisabled(arr) {
@@ -35,7 +35,12 @@ export function getActiveKey(props, originalActiveKey) {
   if (activeKey) {
     let found;
     loopMenuItem(children, (c, i) => {
-      if (c && !c.props.disabled && activeKey === getKeyFromChildrenIndex(c, eventKey, i)) {
+      if (
+        c &&
+        c.props &&
+        !c.props.disabled &&
+        activeKey === getKeyFromChildrenIndex(c, eventKey, i)
+      ) {
         found = true;
       }
     });
@@ -101,6 +106,8 @@ export class SubPopupMenu extends React.Component {
     triggerSubMenuAction: PropTypes.oneOf(['click', 'hover']),
     inlineIndent: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     manualRef: PropTypes.func,
+    itemIcon: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
+    expandIcon: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
   };
 
   static defaultProps = {
@@ -139,13 +146,20 @@ export class SubPopupMenu extends React.Component {
     return this.props.visible || nextProps.visible;
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
     const props = this.props;
     const originalActiveKey = 'activeKey' in props ? props.activeKey :
       props.store.getState().activeKey[getEventKey(props)];
     const activeKey = getActiveKey(props, originalActiveKey);
     if (activeKey !== originalActiveKey) {
       updateActiveKey(props.store, getEventKey(props), activeKey);
+    } else if ('activeKey' in prevProps) {
+      // If prev activeKey is not same as current activeKey,
+      // we should set it.
+      const prevActiveKey = getActiveKey(prevProps, prevProps.activeKey);
+      if (activeKey !== prevActiveKey) {
+        updateActiveKey(props.store, getEventKey(props), activeKey);
+      }
     }
   }
 
@@ -257,9 +271,13 @@ export class SubPopupMenu extends React.Component {
     const props = this.props;
     const key = getKeyFromChildrenIndex(child, props.eventKey, i);
     const childProps = child.props;
+    // https://github.com/ant-design/ant-design/issues/11517#issuecomment-477403055
+    if (!childProps || typeof child.type === 'string') {
+      return child;
+    }
     const isActive = key === state.activeKey;
     const newChildProps = {
-      mode: props.mode,
+      mode: childProps.mode || props.mode,
       level: props.level,
       inlineIndent: props.inlineIndent,
       renderMenuItem: this.renderMenuItem,
@@ -286,9 +304,12 @@ export class SubPopupMenu extends React.Component {
       onDeselect: this.onDeselect,
       onSelect: this.onSelect,
       builtinPlacements: props.builtinPlacements,
+      itemIcon: childProps.itemIcon || this.props.itemIcon,
+      expandIcon: childProps.expandIcon || this.props.expandIcon,
       ...extraProps,
     };
-    if (props.mode === 'inline') {
+    // ref: https://github.com/ant-design/ant-design/issues/13943
+    if (props.mode === 'inline' || isMobileDevice()) {
       newChildProps.triggerSubMenuAction = 'click';
     }
     return React.cloneElement(child, newChildProps);
@@ -329,19 +350,23 @@ export class SubPopupMenu extends React.Component {
       domProps.tabIndex = '0';
       domProps.onKeyDown = this.onKeyDown;
     }
-    const { prefixCls, eventKey, visible } = props;
+    const { prefixCls, eventKey, visible, level, mode, overflowedIndicator, theme } = props;
     menuAllProps.forEach(key => delete props[key]);
 
     // Otherwise, the propagated click event will trigger another onClick
     delete props.onClick;
+
     return (
-      // ESLint is not smart enough to know that the type of `children` was checked.
-      /* eslint-disable */
       <DOMWrap
         {...props}
+        prefixCls={prefixCls}
+        mode={mode}
         tag="ul"
+        level={level}
+        theme={theme}
         hiddenClassName={`${prefixCls}-hidden`}
         visible={visible}
+        overflowedIndicator={overflowedIndicator}
         {...domProps}
       >
         {React.Children.map(
@@ -349,9 +374,9 @@ export class SubPopupMenu extends React.Component {
           (c, i) => this.renderMenuItem(c, i, eventKey || '0-menu-'),
         )}
       </DOMWrap>
-      /*eslint-enable */
     );
   }
 }
+const connected = connect()(SubPopupMenu);
 
-export default connect()(SubPopupMenu);
+export default connected;

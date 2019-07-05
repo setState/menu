@@ -69,7 +69,7 @@ ReactDOM.render(<Menu>
         <tr>
           <td>mode</td>
           <td>String</td>
-          <td>vertical</td>
+          <th>vertical</th>
           <td>one of ["horizontal","inline","vertical-left","vertical-right"]</td>
         </tr>
         <tr>
@@ -192,6 +192,18 @@ ReactDOM.render(<Menu>
             <th>see <a href="./src/placements.jsx">placements.jsx</a></th>
             <td>Describes how the popup menus should be positioned</td>
         </tr>
+        <tr>
+            <td>itemIcon</td>
+            <td>ReactNode | (props: MenuItemProps) => ReactNode</td>
+            <th></th>
+            <td>Specify the menu item icon.</td>
+        </tr>
+        <tr>
+            <td>expandIcon</td>
+            <td>ReactNode | (props: SubMenuProps & { isSubMenu: boolean }) => ReactNode</td>
+            <th></th>
+            <td>Specify the menu item icon.</td>
+        </tr>
     </tbody>
 </table>
 
@@ -237,6 +249,12 @@ ReactDOM.render(<Menu>
             <th></th>
             <td></td>
         </tr>
+        <tr>
+            <td>itemIcon</td>
+            <td>ReactNode | (props: MenuItemProps) => ReactNode</td>
+            <th></th>
+            <td>Specify the menu item icon.</td>
+        </tr>
     </tbody>
 </table>
 
@@ -254,7 +272,7 @@ ReactDOM.render(<Menu>
     </thead>
     <tbody>
         <tr>
-          <td>className</td>
+          <td>popupClassName</td>
           <td>String</td>
           <td></td>
           <td>additional css class of root dom node</td>
@@ -264,6 +282,12 @@ ReactDOM.render(<Menu>
           <td>String/ReactElement</td>
           <td></td>
           <td>sub menu's content</td>
+        </tr>
+        <tr>
+          <td>overflowedIndicator</td>
+          <td>String/ReactElement</td>
+          <td>···</td>
+          <td>overflow indicator when menu overlows in horizontal mode</td>
         </tr>
         <tr>
             <td>key</td>
@@ -312,6 +336,18 @@ ReactDOM.render(<Menu>
             <td>Array</td>
             <th></th>
             <td>The offset of the popup submenu, in an x, y coordinate array. e.g.: `[0,15]`</td>
+        </tr>
+        <tr>
+            <td>expandIcon</td>
+            <td>ReactNode | (props: SubMenuProps) => ReactNode</td>
+            <th></th>
+            <td>Specify the menu item icon.</td>
+        </tr>
+        <tr>
+            <td>itemIcon</td>
+            <td>ReactNode | (props: SubMenuProps & { isSubMenu: boolean }) => ReactNode</td>
+            <th></th>
+            <td>Specify the menu item icon.</td>
         </tr>
     </tbody>
 </table>
