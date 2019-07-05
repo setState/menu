@@ -330,6 +330,25 @@ export class SubPopupMenu extends React.Component {
     return this.renderCommonMenuItem(c, i, extraProps);
   };
 
+  getMenuOffset() {
+    const { count, children } = this.props;
+
+    const menuHeight = 42;
+
+    const realHeight = menuHeight * (count + children.length);
+
+    // 用来判断是否被遮挡住
+    const hiddenHeight = realHeight - document.body.clientHeight;
+
+    // 采用bottom定位方式，计算相对于当前定位的偏移量，66实际为头部高度61+5
+    const bottomOffset = document.body.clientHeight - menuHeight * (count) - 66;
+
+    return {
+      top: hiddenHeight > 0 ? 'auto' : 0,
+      bottom: hiddenHeight > 0 ? -bottomOffset : 'auto',
+    };
+  }
+
   render() {
     const { ...props } = this.props;
     this.instanceArray = [];
@@ -355,6 +374,16 @@ export class SubPopupMenu extends React.Component {
 
     // Otherwise, the propagated click event will trigger another onClick
     delete props.onClick;
+
+    // 添加偏移量
+    const offset = this.getMenuOffset();
+
+    const style = {
+      ...props.style,
+      ...offset,
+    };
+
+    props.style = style;
 
     return (
       <DOMWrap

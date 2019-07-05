@@ -65,6 +65,7 @@ export class SubMenu extends React.Component {
     manualRef: PropTypes.func,
     itemIcon: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
     expandIcon: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
+    count: PropTypes.number,
   };
 
   static defaultProps = {
@@ -374,6 +375,7 @@ export class SubMenu extends React.Component {
       manualRef: this.saveMenuInstance,
       itemIcon: props.itemIcon,
       expandIcon: props.expandIcon,
+      count: props.count,
     };
 
     const haveRendered = this.haveRendered;
