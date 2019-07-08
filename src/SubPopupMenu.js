@@ -108,6 +108,7 @@ export class SubPopupMenu extends React.Component {
     manualRef: PropTypes.func,
     itemIcon: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
     expandIcon: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
+    count: PropTypes.number,
   };
 
   static defaultProps = {
@@ -225,6 +226,26 @@ export class SubPopupMenu extends React.Component {
     return this.props.openTransitionName;
   };
 
+
+  getMenuOffset() {
+    const { count, children } = this.props;
+
+    const menuHeight = 42;
+
+    const realHeight = menuHeight * (count + children.length);
+
+    // 用来判断是否被遮挡住
+    const hiddenHeight = realHeight - document.body.clientHeight;
+
+    // 采用bottom定位方式，计算相对于当前定位的偏移量，66实际为头部高度61+5
+    const bottomOffset = document.body.clientHeight - menuHeight * (count) - 66;
+
+    return {
+      top: hiddenHeight > 0 ? 'auto' : 0,
+      bottom: hiddenHeight > 0 ? -bottomOffset : 'auto',
+    };
+  }
+
   step = (direction) => {
     let children = this.getFlatInstanceArray();
     const activeKey = this.props.store.getState().activeKey[getEventKey(this.props)];
@@ -329,25 +350,6 @@ export class SubPopupMenu extends React.Component {
     };
     return this.renderCommonMenuItem(c, i, extraProps);
   };
-
-  getMenuOffset() {
-    const { count, children } = this.props;
-
-    const menuHeight = 42;
-
-    const realHeight = menuHeight * (count + children.length);
-
-    // 用来判断是否被遮挡住
-    const hiddenHeight = realHeight - document.body.clientHeight;
-
-    // 采用bottom定位方式，计算相对于当前定位的偏移量，66实际为头部高度61+5
-    const bottomOffset = document.body.clientHeight - menuHeight * (count) - 66;
-
-    return {
-      top: hiddenHeight > 0 ? 'auto' : 0,
-      bottom: hiddenHeight > 0 ? -bottomOffset : 'auto',
-    };
-  }
 
   render() {
     const { ...props } = this.props;
